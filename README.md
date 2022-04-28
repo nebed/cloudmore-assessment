@@ -3,8 +3,14 @@
 ## Task 1
 
 ### Tools Used
- - Terraform
- - Ansible
+ - Terraform = v1.1.8
+ - Ansible = 2.11.2
+
+### How to Install
+ - `git clone https://github.com/nebed/cloudmore-assessment`
+ - `cd cloudmore-assessment/terraform`
+ - `terraform init`
+ - `terraform apply`
 
 ### Package Configuration
  - Docker
