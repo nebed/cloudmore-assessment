@@ -4,8 +4,8 @@ terraform {
     storage_account_name = "nebedterraform"
     container_name = "tfstate"
     key = "cloudmore/assessment.tfstate"
-    subscription_id = "fdd0849c-e721-4449-afa2-3f64194af407"
-    tenant_id = "e08e4203-21ec-4a41-ab58-cab52b59dc64"
+    subscription_id = "xxxxxxxxxxxxxxx"
+    tenant_id = "xxxxxxxxxxxxxxx"
 }
 
   required_providers {
@@ -23,6 +23,6 @@ provider "azurerm" {
 }
 
 locals {
-  subscription_id = "fdd0849c-e721-4449-afa2-3f64194af407" 
-  tenant_id = "e08e4203-21ec-4a41-ab58-cab52b59dc64"
+  subscription_id = "xxxxxxxxxxxxxxx" 
+  tenant_id = "xxxxxxxxxxxxxxx"
 }
