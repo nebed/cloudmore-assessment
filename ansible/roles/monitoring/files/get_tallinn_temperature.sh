@@ -1,0 +1,2 @@
+TEMP=$(curl -sSL "https://api.openweathermap.org/data/2.5/weather?lat=59.436962&lon=24.753574&appid=$API_KEY" | jq .main.temp)
+echo "openweather_temperature{city=\"Tallinn\"} $TEMP" > /var/lib/node_exporter/temp.prom.new && mv /var/lib/node_exporter/temp.prom.new /var/lib/node_exporter/temp.prom

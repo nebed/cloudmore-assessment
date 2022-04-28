@@ -1,0 +1,91 @@
+- name: "Create Monitoring Directory"
+  file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+    - "/home/{{ ansible_user }}/monitoring"
+    - "/home/{{ ansible_user }}/monitoring/grafana"
+    - "/home/{{ ansible_user }}/monitoring/grafana/provisioning"
+    - "/home/{{ ansible_user }}/monitoring/grafana/provisioning/datasources"
+    - "/home/{{ ansible_user }}/monitoring/grafana/provisioning/dashboards"
+
+- name: "Create Node_Exporter Directory"
+  become: yes
+  file:
+    path: "/var/lib/node_exporter"
+    state: directory
+
+- name: "Create required Files - Prometheus Config"
+  copy:
+    src: files/prometheus.yml
+    dest: "/home/{{ ansible_user }}/monitoring/prometheus.yml"
+
+- name: "Create required Files - Docker Compose"
+  copy:
+    src: files/docker-compose.yml
+    dest: "/home/{{ ansible_user }}/monitoring/docker-compose.yml"
+
+- name: "Create required Files - Env"
+  copy:
+    src: files/env.template
+    dest: "/home/{{ ansible_user }}/monitoring/.env"
+
+- name: "Create required Files - Grafana Datasource"
+  copy:
+    src: files/datasource.yml
+    dest: "/home/{{ ansible_user }}/monitoring/grafana/provisioning/datasources/datasource.yml"
+
+- name: "Create required Files - Grafana Dashboards"
+  copy:
+    src: files/dashboard.yml
+    dest: "/home/{{ ansible_user }}/monitoring/grafana/provisioning/dashboards/dashboard.yml"
+
+- name: "Create required Files - Grafana Dashboards docker host"
+  copy:
+    src: files/docker_host.json
+    dest: "/home/{{ ansible_user }}/monitoring/grafana/provisioning/dashboards/docker_host.json"
+
+- name: "Create required Files - Grafana Dashboards docker containers"
+  copy:
+    src: files/docker_containers.json
+    dest: "/home/{{ ansible_user }}/monitoring/grafana/provisioning/dashboards/docker_containers.json"
+
+- name: "Deploy Containers"
+  args:
+    chdir: "/home/{{ ansible_user }}/monitoring"
+  shell: "docker-compose up -d"
+
+- name: "Updating Apt Cache"
+  become: yes
+  apt:
+    update_cache: yes
+
+- name: "Install Common Apt Packages"
+  become: yes
+  apt:
+    state: present
+    pkg:
+      - jq
+
+- name: "Create Temperature Script"
+  become: yes
+  copy:
+    src: files/get_tallinn_temperature.sh
+    dest: "/opt/get_tallinn_temperature.sh"
+    mode: '0755'
+
+
+- name: "Create Cronjob"
+  become: yes
+  cron:
+    name: "write prometheus temp metrics"
+    state: present
+    minute: "*/2"
+    hour: "*"
+    day: "*"
+    month: "*"
+    weekday: "*"
+    user: root
+    job: '/opt/get_tallinn_temperature.sh'
+
+

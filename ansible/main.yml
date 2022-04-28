@@ -1,0 +1,9 @@
+---
+- hosts: all
+  become: true
+  roles:
+    - role: docker
+      vars:
+        version: "5:20.10.14~3-0~ubuntu-focal"
+        docker_compose_version: "v2.4.1"
+    - role: monitoring

@@ -1,0 +1,99 @@
+- name: "Updating Apt Cache"
+  become: yes
+  apt:
+    update_cache: yes
+
+- name: "Install Common Apt Packages"
+  become: yes
+  apt:
+    state: present
+    pkg:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - software-properties-common
+
+- name: "Install Docker Apt Repo Key"
+  become: yes
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+# Install Docker Repo
+- name: "Install Docker Repo"
+  become: yes
+  apt_repository:
+    repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
+    state: present
+    filename: docker
+    mode: 666
+
+- name: "Updating Apt Cache"
+  become: yes
+  apt:
+    update_cache: yes
+
+- name: "Unpinning Docker Package"
+  become: yes
+  shell: apt-mark unhold docker-ce
+
+### Install Docker DPKG
+- name: "Install Docker Package"
+  become: yes
+  vars:
+    docker_version: "{{ version }}"
+    docker_pkg_name: "docker-ce={{ docker_version }}"
+  apt:
+    force: yes
+    pkg: "{{ docker_pkg_name }}"
+    state: present
+  notify:
+    - Restart Docker Service
+
+- name: "Pinning Docker Package"
+  become: yes
+  shell: apt-mark hold docker-ce
+
+### Drop in daemon JSON config
+- name: "Create Docker etc config Dir"
+  become: yes
+  file:
+    state: directory
+    path: /etc/docker
+  notify:
+    - Restart Docker Service
+
+- name: "Install Docker Daemon Config JSON"
+  become: yes
+  copy:
+    src: files/daemon.json
+    dest: /etc/docker/daemon.json
+  notify:
+    - Restart Docker Service
+
+
+### Set up SystemD
+- name: "Create SystemD Docker Directory"
+  become: yes
+  file:
+    path: /etc/systemd/system/docker.service.d
+    state: directory
+  notify:
+    - Restart Docker Service
+
+### Set sysctl nf iptables bit
+- name: "Set bridge-nf-calls-iptables Boolean for Docker"
+  become: yes
+  sysctl:
+    name: net.bridge.bridge-nf-call-iptables
+    value: '1'
+    sysctl_set: yes
+    state: present
+    reload: yes
+
+- name: "Download Docker Compose"
+  become: yes
+  get_url:
+    url: "https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-linux-x86_64"
+    dest: /usr/local/bin/docker-compose
+    mode: '0755'
