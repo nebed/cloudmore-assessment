@@ -27,7 +27,7 @@ A cronjob is configured to run the temperature bash script every 2 minutes.
 
 Dashboard Link [Tallinn Temperature](http://40.122.71.123:3000/d/oxCoOlQ7z/monitor-tallinn-temperature?orgId=1)
 
-<img width="1440" alt="image" src="https://user-images.githubusercontent.com/22051438/165707700-68d3811c-5a50-4116-b54b-44cc03de39b7.png">
+<img width="1392" alt="image" src="https://user-images.githubusercontent.com/22051438/165899184-5690d41a-3b3e-4c13-a18c-d1f2df89190f.png">
 
 
 ## Task 2
